@@ -102,18 +102,25 @@
         <div class="ns-absolute ns-top-14 ns-left-0 ns-right-0 ns-h-16 ns-bg-gradient-to-b ns-from-white ns-to-transparent ns-pointer-events-none ns-opacity-70 ns-z-10" :class="{ 'ns-hidden': isAtTop }"></div>
 
         <!-- Bottom overlay -->
-        <div class="ns-absolute ns-bottom-14 ns-left-0 ns-right-0 ns-h-16 ns-bg-gradient-to-t ns-from-white ns-to-transparent ns-pointer-events-none ns-opacity-70 ns-z-10" :class="{ 'ns-hidden': isAtBottom }"></div>
+        <div class="ns-absolute ns-bottom-[6.25rem] ns-left-0 ns-right-0 ns-h-16 ns-bg-gradient-to-t ns-from-white ns-to-transparent ns-pointer-events-none ns-opacity-70 ns-z-10" :class="{ 'ns-hidden': isAtBottom }"></div>
     
         <!-- input area -->
-        <div class="ns-p-4 ns-border-t ns-border-gray-200">
-            <div class="ns-flex ns-items-center ns-bg-gray-100 ns-rounded-full ns-px-4 ns-py-2">
-                <input type="text" placeholder="Type a message..." class="ns-flex-1 ns-bg-transparent ns-outline-none ns-text-sm">
-                <button class="ns-ml-2 ns-text-blue-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="ns-h-5 ns-w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
+        <div class="ns-px-4">
+            <div class="ns-flex ns-items-center ns-border ns-border-gray-200 ns-bg-gray-50 ns-rounded-full ns-px-4 ns-h-12">
+                <input type="text" placeholder="Type a message..." class="ns-flex-1 ns-bg-transparent ns-outline-none ns-text-sm placeholder:ns-text-gray-500 focus:ns-outline-none focus:ns-ring-0 focus:ns-ring-transparent">
+                <button class="ns-ml-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+                        <g id="noun-send-6644234-1__noun-send-6644234 1">
+                            <path id="noun-send-6644234-1__Vector" fill="#6B7280" d="M17.319 7.725 5.018 1.53c-.976-.494-2.088-.331-2.888.425-.862.813-1.119 2.05-.644 3.163.638 1.5 1.381 3.275 1.45 3.443.2.481.65.819 1.169.819H10c.825 0 .825 1.25 0 1.25H4.106c-.481 0-.95.287-1.181.831-.394.944-.913 2.182-1.444 3.425a2.792 2.792 0 0 0 .644 3.163 2.503 2.503 0 0 0 1.737.706 2.59 2.59 0 0 0 1.157-.281l12.375-6.238A2.503 2.503 0 0 0 18.73 9.55c-.138-.794-.694-1.457-1.419-1.819l.006-.006Z"/>
+                        </g>
                     </svg>
                 </button>
             </div>
+        </div>
+
+        <!-- branding -->
+        <div class="ns-p-4 ns-text-gray-400 ns-text-sm ns-text-center ns-w-full">
+            <p>Powered by <a href="https://nous.my">Nous</a></p>
         </div>
     </div>
 </template>
