@@ -30,7 +30,7 @@
 
         <!-- body -->
         <!-- chat messages container -->
-        <div class="ns-flex-1 ns-overflow-y-auto ns-p-4" ref="chatContainer">
+        <div class="ns-flex-1 ns-overflow-y-auto ns-p-4 ns-relative" ref="chatContainer">
             <!-- chat system bubble -->
             <div class="ns-flex ns-items-end ns-mb-4">
                 <!-- avatar -->
@@ -97,8 +97,14 @@
                 </div>
             </div>
         </div>
+
+         <!-- Top overlay -->
+        <div class="ns-absolute ns-top-14 ns-left-0 ns-right-0 ns-h-16 ns-bg-gradient-to-b ns-from-white ns-to-transparent ns-pointer-events-none ns-opacity-70 ns-z-10" :class="{ 'ns-hidden': isAtTop }"></div>
+
+        <!-- Bottom overlay -->
+        <div class="ns-absolute ns-bottom-14 ns-left-0 ns-right-0 ns-h-16 ns-bg-gradient-to-t ns-from-white ns-to-transparent ns-pointer-events-none ns-opacity-70 ns-z-10" :class="{ 'ns-hidden': isAtBottom }"></div>
     
-    <!-- input area -->
+        <!-- input area -->
         <div class="ns-p-4 ns-border-t ns-border-gray-200">
             <div class="ns-flex ns-items-center ns-bg-gray-100 ns-rounded-full ns-px-4 ns-py-2">
                 <input type="text" placeholder="Type a message..." class="ns-flex-1 ns-bg-transparent ns-outline-none ns-text-sm">
@@ -113,13 +119,16 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+
 const props = defineProps({
     title: { type: String, required: true },
     firstMessage: { type: String, required: true }
 })
 
 const chatContainer = ref(null)
+const isAtTop = ref(true)
+const isAtBottom = ref(true)
 
 const scrollToBottom = () => {
     if (chatContainer.value) {
@@ -127,8 +136,17 @@ const scrollToBottom = () => {
     }
 }
 
+const handleScroll = () => {
+    if (chatContainer.value) {
+        const { scrollTop, scrollHeight, clientHeight } = chatContainer.value
+        isAtTop.value = scrollTop === 0
+        isAtBottom.value = scrollTop + clientHeight >= scrollHeight - 1
+    }
+}
+
 onMounted(() => {
     scrollToBottom()
+    chatContainer.value.addEventListener('scroll', handleScroll)
 })
 
 // Assuming you have a messages prop or reactive data
@@ -136,4 +154,9 @@ onMounted(() => {
 watch(() => props.messages, () => {
     scrollToBottom()
 }, { deep: true })
+
+// Clean up event listener
+onUnmounted(() => {
+    chatContainer.value.removeEventListener('scroll', handleScroll)
+})
 </script>
