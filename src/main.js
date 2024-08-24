@@ -1,13 +1,16 @@
 import { createApp } from 'vue'
 import NousChat from './components/NousChat.vue'
-import styles from './components/NousChat.css?inline'
+import style from './style.css?inline'
 
 const Nous = {
     init(config) {
-        // Inject styles
-        const styleElement = document.createElement('style')
-        styleElement.textContent = styles
-        document.head.appendChild(styleElement)
+        // Inject style
+        if (!document.getElementById('nous-chat-style')) {
+            const styleElement = document.createElement('style')
+            styleElement.id = 'nous-chat-style'
+            styleElement.textContent = style
+            document.head.appendChild(styleElement)
+        }
 
         // Create and mount Vue app
         const container = document.createElement('div')

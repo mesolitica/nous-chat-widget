@@ -20,6 +20,10 @@ export default defineConfig({
                     vue: 'Vue'
                 }
             }
-        }
+        },
+        cssCodeSplit: false
+    },
+    server: {
+        open: '/index.html'
     }
 })
