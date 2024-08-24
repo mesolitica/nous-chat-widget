@@ -30,7 +30,7 @@
 
         <!-- body -->
         <!-- chat messages container -->
-        <div class="ns-flex-1 ns-overflow-y-auto ns-p-4 ns-relative" ref="chatContainer">
+        <div class="ns-flex-1 ns-overflow-y-auto ns-p-4 ns-relative no-scrollbar" ref="chatContainer">
             <!-- chat system bubble -->
             <div class="ns-flex ns-items-end ns-mb-4">
                 <!-- avatar -->
