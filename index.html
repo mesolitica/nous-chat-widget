@@ -32,11 +32,9 @@
         <p>Try interacting with the widget to ensure it's working correctly.</p>
     </div>
     
-    <script src="http://localhost:5173/dist/nous-chat.js"></script>
-
-    <script> // add for development type="module"
-        // import Nous from './src/main.js' // for development only
-
+    <!-- Open this file in browser -->
+    <script src="./dist/nous-chat.js"></script>
+    <script>
         Nous.init({
             color: '#1076EE',
             fontFamily: "Arial, sans-serif",
@@ -48,5 +46,21 @@
             initPayload: 'SpecialInitPayLoadDoNotTouch'
         });
     </script>
+
+    <!-- For development enabled this, run yarn dev -->
+    <!-- <script src="http://localhost:5173/dist/nous-chat.js"></script>
+    <script type="module"> // add for development type="module"
+        import Nous from './src/main.js' // for development only
+        Nous.init({
+            color: '#1076EE',
+            fontFamily: "Arial, sans-serif",
+            zIndex: '1000',
+            webhookUrl: 'https://happytohelp-mesolitica-com-2927-rasa.nous.mesolitica.com/webhooks/rest_v2/webhook',
+            title: 'Microlink Bot',
+            firstMessage: "Hi there!",
+            secondMessage: "How can I help you today?",
+            initPayload: 'SpecialInitPayLoadDoNotTouch'
+        });
+    </script> -->
 </body>
 </html>
