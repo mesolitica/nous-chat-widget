@@ -23,7 +23,7 @@ export default defineConfig({
         },
         cssCodeSplit: false
     },
-    server: {
-        open: '/index.html'
-    }
+    // server: {
+    //     open: '/index.html'
+    // }
 })
