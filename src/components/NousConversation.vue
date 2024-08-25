@@ -54,7 +54,7 @@
                     </div>
                     <!-- message content -->
                     <div class="ns-flex ns-flex-col">
-                        <div class="ns-bg-gray-100 ns-rounded-xl ns-rounded-bl-sm ns-p-3 ns-max-w-[80%]">
+                        <div class="ns-bg-gray-100 ns-rounded-xl ns-rounded-bl-sm ns-p-3 ns-max-w-[100%]">
                             <p class="ns-text-sm">{{ message.text }}</p>
                         </div>
                         <!-- timestamp -->
@@ -66,7 +66,7 @@
                 <div v-else class="ns-flex ns-justify-end ns-mb-4">
                     <!-- message content -->
                     <div class="ns-flex ns-flex-col ns-items-end">
-                        <div class="ns-rounded-xl ns-rounded-br-sm ns-p-3 ns-max-w-[80%]"
+                        <div class="ns-rounded-xl ns-rounded-br-sm ns-p-3 ns-max-w-[100%]"
                             :style="{ backgroundColor: 'var(--nous-chat-color)' }">
                             <p class="ns-text-sm ns-text-white">{{ message.text }}</p>
                         </div>

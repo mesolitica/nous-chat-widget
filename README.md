@@ -1,5 +1,27 @@
-# Vue 3 + Vite
+# Chat Widget 💬
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Customizable Web Chat Widget 💬
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## Features 🔥
+
+- Collapse and expand animation.
+- Fullscreen button and animation.
+- Waiting chat respond animation.
+- Customize color, title, font family and first message.
+- Custom POST request.
+- Auto generate user UUID and store the historical chats in UserSession.
+- Error message on exception.
+- 100% pure vanilla Javascript.
+
+<img src="img/hi-there.png" width="50%">
+
+## how to dev
+
+1. Use Yarn,
+
+```bash
+yarn install
+yarn run dev
+```
+
+2. Access http://localhost:5173
