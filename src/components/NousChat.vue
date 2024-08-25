@@ -43,7 +43,6 @@
 import { ref, computed, onMounted, provide } from 'vue'
 import NousHome from './NousHome.vue'
 import NousConversation from './NousConversation.vue'
-import axios from 'axios'
 
 // Props
 const props = defineProps({
@@ -86,7 +85,16 @@ provide('nousChatProps', props)
 
 // State variables
 const isOpen = ref(false)
-const activeComponent = ref(NousHome)
+const activeComponent = ref()
+
+onMounted(() => {
+    const userSessionId = localStorage.getItem('nous-user-session-id')
+    if (userSessionId) {
+        activeComponent.value = NousConversation
+    } else {
+        activeComponent.value = NousHome
+    }
+})
 
 // Computed property for widget styles
 const widgetStyle = computed(() => ({

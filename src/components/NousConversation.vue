@@ -27,7 +27,9 @@
             </div>
 
             <!-- title or bot name -->
-            <h1 class="ns-text-white ns-font-semibold ns-ml-2">{{ props.title }}</h1>
+            <h1 class="ns-text-white ns-font-semibold ns-ml-2 ns-grow">{{ props.title }}</h1>
+
+            <DropdownMoreAction @start-new-session="handleStartNewSession"></DropdownMoreAction>
         </div>
 
         <!-- body -->
@@ -112,6 +114,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, inject } from 'vue'
 import TypingIndicator from './TypingIndicator.vue'
+import DropdownMoreAction from './DropdownMoreAction.vue'
+import { useFormatTimestamp } from '../composables/useFormatTimestamp'
 import axios from 'axios'
 
 const props = inject('nousChatProps')
@@ -120,23 +124,49 @@ const chatContainer = ref(null)
 const isAtTop = ref(true)
 const isAtBottom = ref(true)
 const userSessionId = ref(null)
+const chatHistorySessionId = ref(null)
 const userInput = ref('')
 const messages = ref([])
 const isTyping = ref(false)
 
+const { formatTimestamp } = useFormatTimestamp()
+
 onMounted(() => {
     scrollToBottom()
-    chatContainer?.value?.addEventListener('scroll', handleScroll)
+    chatContainer.value?.addEventListener('scroll', handleScroll)
 
-    userSessionId.value = localStorage.getItem('nous-user-session-id')
-    if (!userSessionId.value) {
-        userSessionId.value = crypto.randomUUID()
-        localStorage.setItem('nous-user-session-id', userSessionId.value)
-    } else {
-        // fetchMessages()
-    }
-    sendInitialMessage()
+    initializeUserSession()
 })
+
+const initializeUserSession = () => {
+    userSessionId.value = localStorage.getItem('nous-user-session-id')
+    
+    if (!userSessionId.value) {
+        createNewUserSession()
+    } else {
+        loadExistingUserSession()
+    }
+}
+
+const createNewUserSession = () => {
+    userSessionId.value = crypto.randomUUID()
+    chatHistorySessionId.value = `nous-chat-history-${userSessionId.value}`
+    localStorage.setItem('nous-user-session-id', userSessionId.value)
+    localStorage.setItem(chatHistorySessionId.value, JSON.stringify([]))
+    sendInitialMessage()
+}
+
+const loadExistingUserSession = () => {
+    chatHistorySessionId.value = `nous-chat-history-${userSessionId.value}`
+    fetchMessages()
+}
+
+const handleStartNewSession = () => {
+    localStorage.removeItem('nous-user-session-id')
+    localStorage.removeItem(chatHistorySessionId.value)
+    messages.value = []
+    createNewUserSession()
+}
 
 // Assuming you have a messages prop or reactive data
 // If not, you'll need to add it to your component
@@ -146,7 +176,7 @@ watch(() => props.messages, () => {
 
 // Clean up event listener
 onUnmounted(() => {
-    chatContainer?.value?.removeEventListener('scroll', handleScroll)
+    chatContainer.value?.removeEventListener('scroll', handleScroll)
 })
 
 const scrollToBottom = () => {
@@ -190,7 +220,6 @@ const sendMessageToServer = async (message, isInitial) => {
         })
         
         const botMessages = response.data
-        if (!isInitial) console.log(botMessages)
         
         botMessages.forEach(msg => {
             addMessage('bot', msg.text)
@@ -202,25 +231,16 @@ const sendMessageToServer = async (message, isInitial) => {
     }
 }
 
-const addMessage = (type, text) => {
-    const timestamp = new Date().toLocaleString('en-US')
-    messages.value.push({ type, text, timestamp })
-}
-
-const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp)
-    const today = new Date()
-    if (date.toDateString() === today.toDateString()) {
-        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+const addMessage = (type, text, timestamp) => {
+    if (!timestamp) {
+        timestamp = new Date().toLocaleString('en-US')
     }
-    return date.toLocaleString('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true })
+    messages.value.push({ type, text, timestamp })
+    localStorage.setItem(chatHistorySessionId.value, JSON.stringify(messages.value))
 }
 
 const fetchMessages = async () => {
-    const response = await axios.get(props.webhookUrl, {
-        params: {
-            sender: userSessionId.value
-        }
-    })
+    const histories = localStorage.getItem(chatHistorySessionId.value)
+    messages.value = JSON.parse(histories)
 }
 </script>

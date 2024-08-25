@@ -27,23 +27,28 @@
 
             <div class="ns-flex ns-items-center ns-bg-white ns-px-5 ns-py-4 ns-rounded-xl ns-border ns-border-gray-100 ns-shadow-chatbox ns-cursor-pointer hover:ns-shadow-lg"
                 @click="$emit('open-recent-conversation')">
-                <div class="ns-w-9 ns-h-9 ns-mr-3 ns-flex ns-items-center ns-justify-center ns-rounded-full"
+                <div class="ns-shrink-0 ns-w-9 ns-h-9 ns-mr-3 ns-flex ns-items-center ns-justify-center ns-rounded-full"
                     :style="{ backgroundColor: 'var(--nous-chat-color)' }">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 18 18">
-                    <g id="frame__Frame" clip-path="url(#frame__clip0_1212_3584)">
-                        <path id="frame__Vector" fill="#fff" d="M13.5 2.25a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H9.957l-3.572 2.143a.75.75 0 0 1-1.13-.558l-.005-.085v-1.5H4.5a3 3 0 0 1-2.996-2.85l-.004-.15v-6a3 3 0 0 1 3-3h9ZM10.5 9H6a.75.75 0 0 0 0 1.5h4.5a.75.75 0 1 0 0-1.5ZM12 6H6a.75.75 0 0 0 0 1.5h6A.75.75 0 1 0 12 6Z"/>
-                    </g>
-                    <defs>
-                        <clipPath id="frame__clip0_1212_3584">
-                        <path fill="#fff" d="M0 0h18v18H0z"/>
-                        </clipPath>
-                    </defs>
+                        <g id="frame__Frame" clip-path="url(#frame__clip0_1212_3584)">
+                            <path id="frame__Vector" fill="#fff" d="M13.5 2.25a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H9.957l-3.572 2.143a.75.75 0 0 1-1.13-.558l-.005-.085v-1.5H4.5a3 3 0 0 1-2.996-2.85l-.004-.15v-6a3 3 0 0 1 3-3h9ZM10.5 9H6a.75.75 0 0 0 0 1.5h4.5a.75.75 0 1 0 0-1.5ZM12 6H6a.75.75 0 0 0 0 1.5h6A.75.75 0 1 0 12 6Z"/>
+                        </g>
+                        <defs>
+                            <clipPath id="frame__clip0_1212_3584">
+                            <path fill="#fff" d="M0 0h18v18H0z"/>
+                            </clipPath>
+                        </defs>
                     </svg>
                 </div>
-                
-                <div>
+
+                <div v-if="!firstMessageFromChatHistory">
                     <h4 class="ns-text-sm ns-font-semibold">Start Conversation</h4>
                     <p class="ns-text-gray-500 ns-text-sm">Typically replies in seconds</p>
+                </div>
+                <div v-else>
+                    <h4 class="ns-text-sm ns-font-semibold">{{ props.title }}</h4>
+                    <p class="ns-text-gray-500 ns-text-sm ns-line-clamp-2 ns-mb-1.5">{{ firstMessageFromChatHistory.text }}</p>
+                    <p class="ns-text-gray-400 ns-text-xs ns-flex-shrink-0">{{ formatTimestamp(firstMessageFromChatHistory.timestamp) }}</p>
                 </div>
             </div>
         </div>
@@ -62,7 +67,26 @@
 </template>
 
 <script setup>
-import { inject } from 'vue'
+import { inject, computed } from 'vue'
+import { useFormatTimestamp } from '../composables/useFormatTimestamp'
 
 const props = inject('nousChatProps')
+const { formatTimestamp } = useFormatTimestamp()
+
+// get first from messages from local storage
+const firstMessageFromChatHistory = computed(() => {
+    const userSessionId = localStorage.getItem('nous-user-session-id')
+
+    if (userSessionId) {
+        const chatHistorySessionId = `nous-chat-history-${userSessionId}`
+        const messages = localStorage.getItem(chatHistorySessionId)
+
+        if (messages) {
+            const parsedMessages = JSON.parse(messages)
+            return parsedMessages[parsedMessages.length - 1]
+        }
+    }
+
+    return null
+})
 </script>
