@@ -17,15 +17,16 @@
             </div>
 
             <!-- welcome message -->
-            <h1 class="ns-text-3xl ns-font-semibold ns-text-white ns-mb-1">{{ firstMessage }}</h1>
-            <p class="ns-text-white/60">{{ secondMessage }}</p>
+            <h1 class="ns-text-3xl ns-font-semibold ns-text-white ns-mb-1">{{ props.firstMessage }}</h1>
+            <p class="ns-text-white/60">{{ props.secondMessage }}</p>
         </div>
 
         <!-- recent conversation -->
         <div class="ns-px-7 ns-w-full ns-mt-auto">
             <p class="ns-text-white ns-text-sm ns-font-medium ns-mb-2">Recent Conversation</p>
 
-            <div class="ns-flex ns-items-center ns-bg-white ns-px-5 ns-py-4 ns-rounded-xl ns-border ns-border-gray-100 ns-shadow-chatbox">
+            <div class="ns-flex ns-items-center ns-bg-white ns-px-5 ns-py-4 ns-rounded-xl ns-border ns-border-gray-100 ns-shadow-chatbox ns-cursor-pointer hover:ns-shadow-lg"
+                @click="$emit('open-recent-conversation')">
                 <div class="ns-w-9 ns-h-9 ns-mr-3 ns-flex ns-items-center ns-justify-center ns-rounded-full"
                     :style="{ backgroundColor: 'var(--nous-chat-color)' }">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 18 18">
@@ -61,8 +62,7 @@
 </template>
 
 <script setup>
-const props = defineProps({
-    firstMessage: { type: String, required: true },
-    secondMessage: { type: String, required: true }
-})
+import { inject } from 'vue'
+
+const props = inject('nousChatProps')
 </script>

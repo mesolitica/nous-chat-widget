@@ -25,16 +25,22 @@
         </div>
 
         <!-- chatbot body container -->
-        <div class="ns-fixed ns-bg-white ns-right-5 ns-bottom-[5.5rem] ns-rounded-2xl ns-shadow-chatbox ns-overflow-hidden"
-        :style="{ height: 'var(--nous-chat-height)', width: 'var(--nous-chat-width)' }">
-            <!-- <NousHome :first-message="firstMessage" :second-message="secondMessage"/> -->
-            <NousConversation :title="title"/>
-        </div>
+        <Transition name="slide-fade">
+            <div class="ns-fixed ns-bg-white ns-right-5 ns-bottom-[5.5rem] ns-rounded-2xl ns-shadow-chatbox ns-overflow-hidden"
+                :style="{ height: 'var(--nous-chat-height)', width: 'var(--nous-chat-width)' }"
+                v-if="isOpen">
+                <Transition name="fade" mode="out-in">
+                    <component :is="activeComponent" 
+                        @open-recent-conversation="openRecentConversation"
+                        @go-back-home="handleGoBackHome"/>
+                </Transition>
+            </div>
+        </Transition>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, provide } from 'vue'
 import NousHome from './NousHome.vue'
 import NousConversation from './NousConversation.vue'
 import axios from 'axios'
@@ -75,10 +81,12 @@ const props = defineProps({
     }
 })
 
+// Provide all props to child components
+provide('nousChatProps', props)
+
 // State variables
 const isOpen = ref(false)
-const messages = ref([])
-const userInput = ref('')
+const activeComponent = ref(NousHome)
 
 // Computed property for widget styles
 const widgetStyle = computed(() => ({
@@ -94,48 +102,12 @@ const toggleChat = () => {
     isOpen.value = !isOpen.value
 }
 
-const sendMessage = async () => {
-    if (!userInput.value.trim()) return
-
-    messages.value.push({ type: 'user', text: userInput.value })
-    const userMessage = userInput.value
-    userInput.value = ''
-
-    try {
-        const response = await axios.post(props.webhookUrl, {
-            message: userMessage
-        })
-        if (response.data && response.data.length > 0) {
-            response.data.forEach(msg => {
-                messages.value.push({ type: 'bot', text: msg.text })
-            })
-        }
-    } catch (error) {
-        console.error('Error sending message:', error)
-        messages.value.push({ type: 'bot', text: 'Sorry, I encountered an error. Please try again.' })
-    }
+const openRecentConversation = () => {
+    activeComponent.value = NousConversation
 }
 
-const sendInitialMessage = async () => {
-    try {
-        const response = await axios.post(props.webhookUrl, {
-            message: props.initPayload
-        })
-        if (response.data && response.data.length > 0) {
-            response.data.forEach(msg => {
-                messages.value.push({ type: 'bot', text: msg.text })
-            })
-        }
-    } catch (error) {
-        console.error('Error sending initial message:', error)
-    }
+// Handle go back home
+const handleGoBackHome = () => {
+    activeComponent.value = NousHome
 }
-
-// Lifecycle hook
-onMounted(() => {
-    if (props.firstMessage) {
-        messages.value.push({ type: 'bot', text: props.firstMessage })
-    }
-    sendInitialMessage()
-})
 </script>
