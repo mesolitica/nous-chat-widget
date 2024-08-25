@@ -1,8 +1,16 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+.nous-chat-wdiget {
+    all: initial; /* Reset all styles */
+}
+  
+.nous-chat-wdiget * {
+    all: unset; /* Reset all styles for child elements */
+}
 
 .nous-chat-widget {
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+    
     /* Add any custom styles for your widget here */
     .no-scrollbar {
         scrollbar-width: none;  /* Firefox */
