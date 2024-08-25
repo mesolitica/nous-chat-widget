@@ -23,6 +23,22 @@ jobs:
       - name: Run build
         run: npm run build
 
+      - name: Configure git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Add and commit dist/nous-chat.js
+        run: |
+          git add dist/nous-chat.js
+          git commit -m "Add dist/nous-chat.js from release build"
+          git push origin HEAD:${{ github.ref }}
+
+      - name: Push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: git push
+
       - name: Upload dist/nous-chat.js to release
         uses: actions/upload-release-asset@v1
         env:
