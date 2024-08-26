@@ -27,7 +27,7 @@
         <!-- chatbot body container -->
         <Transition name="slide-fade">
             <div class="ns-fixed ns-bg-white ns-right-5 ns-bottom-[5.5rem] ns-rounded-2xl ns-shadow-chatbox ns-overflow-hidden"
-                :style="{ height: 'var(--nous-chat-height)', width: 'var(--nous-chat-width)' }"
+                :style="{ height: 'var(--nous-chat-height)', width: 'var(--nous-chat-width)', 'z-index': 'var(--nous-chat-z-index)' }"
                 v-if="isOpen">
                 <Transition name="fade" mode="out-in">
                     <component :is="activeComponent" 
