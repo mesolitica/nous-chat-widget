@@ -1,27 +1,20 @@
-.nous-chat-wdiget {
-    all: initial; /* Reset all styles */
-}
-  
-.nous-chat-wdiget * {
-    all: unset; /* Reset all styles for child elements */
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 .nous-chat-widget {
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
-
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
-    font-size: 16px;
 
     /* Add any custom styles for your widget here */
     .no-scrollbar {
-        scrollbar-width: none;  /* Firefox */
-        -ms-overflow-style: none;  /* IE and Edge */
-      }
-      
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
+    }
+
     .no-scrollbar::-webkit-scrollbar {
-        display: none;  /* Chrome, Safari and Opera */
+        display: none;
+        /* Chrome, Safari and Opera */
     }
 
     .slide-fade-enter-active,
