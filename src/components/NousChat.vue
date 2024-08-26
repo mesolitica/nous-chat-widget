@@ -58,10 +58,6 @@ const props = defineProps({
         type: String,
         default: 'Padi Bot'
     },
-    fontFamily: {
-        type: String,
-        default: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif"
-    },
     firstMessage: {
         type: String,
         default: 'Chat with us'
@@ -99,7 +95,6 @@ onMounted(() => {
 // Computed property for widget styles
 const widgetStyle = computed(() => ({
     '--nous-chat-color': props.color,
-    '--nous-chat-font-family': props.fontFamily,
     '--nous-chat-z-index': props.zIndex,
     '--nous-chat-width': '364px',
     '--nous-chat-height': '620px'
