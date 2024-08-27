@@ -8,9 +8,10 @@ Customizable Web Chat Widget 💬
 - Waiting chat respond animation.
 - Customize color, title, font family and first message.
 - Custom POST request.
-- Support SSE Streaming.
 - Auto generate user UUID and store the historical chats in UserSession.
 - Error message on exception.
+- Audio streaming using RecordRTC.
+- Support SSE Streaming (we will make OpenAI compatible).
 
 <img src="img/hi-there.png" width="50%">
 
