@@ -271,79 +271,11 @@ const wavesurfer = ref(null);
 const record = ref(null);
 const waveformContainer = ref(null);
 const get_mic_permission = ref(false);
-let scrollingWaveform = false;
 const recordAudio = ref(null);
-
-const destroyWaveSurfer = () => {
-  if (wavesurfer.value) {
-    wavesurfer.value.destroy();
-  }
-};
-
-async function asyncSend(blob) {
-  const arr = await blob.arrayBuffer();
-  const base64String = btoa(
-    String.fromCharCode.apply(null, new Uint8Array(arr))
-  );
-  console.log(base64String);
-}
-
-const destroyRecordRTC = () => {
-  if (recordAudio.value) {
-    recordAudio.value.destroy();
-  }
-};
-
-const createRecordRTC = () => {
-  console.log(StereoAudioRecorder);
-  navigator.getUserMedia(
-    {
-      audio: true,
-    },
-    function (stream) {
-      recordAudio.value = RecordRTC(stream, {
-        type: "audio",
-        mimeType: "audio/webm",
-        sampleRate: 44100,
-        desiredSampRate: 16000,
-
-        recorderType: StereoAudioRecorder,
-        numberOfAudioChannels: 1,
-        timeSlice: 100,
-        ondataavailable: function (blob) {
-          asyncSend(blob);
-        },
-      });
-
-      console.log(recordAudio.value);
-      recordAudio.value.startRecording();
-    },
-    function (error) {
-      console.error(JSON.stringify(error));
-    }
-  );
-};
-
-const createWaveSurfer = () => {
-  if (wavesurfer.value) {
-    wavesurfer.value.destroy();
-  }
-  wavesurfer.value = WaveSurfer.create({
-    container: waveformContainer.value,
-    waveColor: "#9ea3ae",
-    progressColor: "#000000",
-    barWidth: 2,
-    barGap: 2,
-    barRadius: 2,
-    height: 48,
-    hideScrollbar: false,
-    cursorWidth: 0,
-  });
-
-  record.value = wavesurfer.value.registerPlugin(
-    RecordPlugin.create({ scrollingWaveform, renderRecordedAudio: false })
-  );
-};
+const ws = ref(null);
+const silentcount = ref(0);
+const firsttime = ref(true);
+let scrollingWaveform = false;
 
 onMounted(() => {
   scrollToBottom();
@@ -380,10 +312,14 @@ const handleStartNewSession = () => {
   localStorage.removeItem(chatHistorySessionId.value);
   messages.value = [];
   createNewUserSession();
+
+  isText.value = true;
+  firsttime.value = true;
+  destroyWaveSurfer();
+  destroyRecordRTC();
+  destroyWebSocket();
 };
 
-// Assuming you have a messages prop or reactive data
-// If not, you'll need to add it to your component
 watch(
   () => props.messages,
   () => {
@@ -399,7 +335,9 @@ onUnmounted(() => {
 
 const scrollToBottom = () => {
   if (chatContainer.value) {
-    chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+    nextTick(() => {
+      chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+    });
   }
 };
 
@@ -432,6 +370,8 @@ const sendMessageToServer = async (message, isInitial) => {
     addMessage("user", message);
   }
 
+  scrollToBottom();
+
   try {
     const response = await axios.post(props.webhookUrl, {
       message: message,
@@ -455,15 +395,131 @@ const addMessage = (type, text, timestamp) => {
     timestamp = new Date().toLocaleString("en-US");
   }
   messages.value.push({ type, text, timestamp });
+
   localStorage.setItem(
     chatHistorySessionId.value,
     JSON.stringify(messages.value)
   );
+  scrollToBottom();
 };
 
 const fetchMessages = async () => {
   const histories = localStorage.getItem(chatHistorySessionId.value);
   messages.value = JSON.parse(histories);
+  scrollToBottom();
+};
+
+const destroyWebSocket = () => {
+  if (ws.value) {
+    ws.value.close();
+    console.log("websocket disconnected.");
+  }
+};
+
+const createWebSocket = () => {
+  const uri = props.webhookUrl
+    .replace("http://", "ws://")
+    .replace("https://", "wss://");
+  ws.value = new WebSocket(
+    `${uri}/ws/${userSessionId.value}?language=${props.asrLanguage}`
+  );
+  ws.value.onmessage = async function (event) {
+    if (event.data == "<|silent|>") {
+      silentcount.value += 1;
+    } else {
+      if (firsttime.value) {
+        addMessage("user", "");
+        firsttime.value = !firsttime.value;
+      }
+      messages.value[messages.value.length - 1].text += event.data;
+      scrollToBottom();
+      silentcount.value = 0;
+    }
+
+    if (silentcount.value >= props.minimumSilentSecond && !firsttime.value) {
+      recordAudio.value.pauseRecording();
+      localStorage.setItem(
+        chatHistorySessionId.value,
+        JSON.stringify(messages.value)
+      );
+      await sendMessageToServer(
+        messages.value[messages.value.length - 1].text,
+        true
+      );
+
+      firsttime.value = !firsttime.value;
+      silentcount.value = 0;
+      recordAudio.value.resumeRecording();
+    }
+  };
+};
+
+const destroyWaveSurfer = () => {
+  if (wavesurfer.value) {
+    wavesurfer.value.destroy();
+  }
+};
+
+async function asyncSend(blob) {
+  const arr = await blob.arrayBuffer();
+  const base64String = btoa(
+    String.fromCharCode.apply(null, new Uint8Array(arr))
+  );
+  ws.value.send(base64String);
+}
+
+const destroyRecordRTC = () => {
+  if (recordAudio.value) {
+    recordAudio.value.destroy();
+  }
+};
+
+const createRecordRTC = () => {
+  navigator.getUserMedia(
+    {
+      audio: true,
+    },
+    function (stream) {
+      recordAudio.value = RecordRTC(stream, {
+        type: "audio",
+        mimeType: "audio/webm",
+        sampleRate: 44100,
+        desiredSampRate: 16000,
+
+        recorderType: StereoAudioRecorder,
+        numberOfAudioChannels: 1,
+        timeSlice: 100,
+        ondataavailable: function (blob) {
+          asyncSend(blob);
+        },
+      });
+      recordAudio.value.startRecording();
+    },
+    function (error) {
+      console.error(JSON.stringify(error));
+    }
+  );
+};
+
+const createWaveSurfer = () => {
+  if (wavesurfer.value) {
+    wavesurfer.value.destroy();
+  }
+  wavesurfer.value = WaveSurfer.create({
+    container: waveformContainer.value,
+    waveColor: "#9ea3ae",
+    progressColor: "#000000",
+    barWidth: 2,
+    barGap: 2,
+    barRadius: 2,
+    height: 48,
+    hideScrollbar: false,
+    cursorWidth: 0,
+  });
+
+  record.value = wavesurfer.value.registerPlugin(
+    RecordPlugin.create({ scrollingWaveform, renderRecordedAudio: false })
+  );
 };
 
 const stream = async () => {
@@ -492,6 +548,7 @@ const stream = async () => {
     }
 
     createWaveSurfer();
+    createWebSocket();
     createRecordRTC();
 
     const deviceId = micSelect.value;
@@ -502,6 +559,7 @@ const stream = async () => {
     await nextTick();
     destroyWaveSurfer();
     destroyRecordRTC();
+    destroyWebSocket();
   }
 };
 </script>
