@@ -67,9 +67,7 @@
         {{ props.title }}
       </h1>
 
-      <DropdownMoreAction
-        @start-new-session="handleStartNewSession"
-      ></DropdownMoreAction>
+      <DropdownMoreAction @start-new-session="handleStartNewSession"></DropdownMoreAction>
     </div>
 
     <!-- body -->
@@ -92,10 +90,7 @@
               fill="none"
               viewBox="0 0 24 24"
             >
-              <g
-                id="logo-86__logo-86"
-                clip-path="url(#logo-86__clip0_1212_3644)"
-              >
+              <g id="logo-86__logo-86" clip-path="url(#logo-86__clip0_1212_3644)">
                 <path
                   id="logo-86__Vector"
                   fill="#007DFC"
@@ -179,9 +174,25 @@
               class="ns-flex-1 ns-bg-transparent ns-outline-none ns-text-sm placeholder:ns-text-gray-500 focus:ns-outline-none focus:ns-ring-0 focus:ns-ring-transparent"
               v-model="userInput"
               @keyup.enter="sendMessage"
+              :disabled="streaming"
             />
+
             <button class="ns-ml-2" @click="sendMessage">
               <svg
+                v-if="streaming"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="#6B7280"
+                viewBox="0 0 20 20"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path
+                  d="M17 4h-10a3 3 0 0 0 -3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3 -3v-10a3 3 0 0 0 -3 -3z"
+                />
+              </svg>
+              <svg
+                v-else
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
                 height="20"
@@ -200,11 +211,7 @@
           </div>
         </div>
         <div v-else key="audio" class="ns-pl-4">
-          <div
-            id="waveform"
-            ref="waveformContainer"
-            class="ns-w-full ns-h-[32px]"
-          ></div>
+          <div id="waveform" ref="waveformContainer" class="ns-w-full ns-h-[32px]"></div>
           <select class="ns-invisible" id="mic-select">
             <option value="" hidden>Select mic</option>
           </select>
@@ -274,7 +281,12 @@ const get_mic_permission = ref(false);
 const recordAudio = ref(null);
 const ws = ref(null);
 const silentcount = ref(0);
-const firsttime = ref(true);
+const user_ref = ref(null);
+const bot_ref = ref(null);
+const firsttime_user = ref(true);
+const firsttime_bot = ref(true);
+const interrupted = ref(false);
+const streaming = ref(false);
 let scrollingWaveform = false;
 
 onMounted(() => {
@@ -307,17 +319,20 @@ const loadExistingUserSession = () => {
   fetchMessages();
 };
 
+const resetState = () => {
+  isText.value = true;
+  firsttime_user.value = true;
+  destroyWaveSurfer();
+  destroyRecordRTC();
+  destroyWebSocket();
+};
+
 const handleStartNewSession = () => {
   localStorage.removeItem("nous-user-session-id");
   localStorage.removeItem(chatHistorySessionId.value);
   messages.value = [];
   createNewUserSession();
-
-  isText.value = true;
-  firsttime.value = true;
-  destroyWaveSurfer();
-  destroyRecordRTC();
-  destroyWebSocket();
+  resetState();
 };
 
 watch(
@@ -350,13 +365,17 @@ const handleScroll = () => {
 };
 
 const sendMessage = async () => {
-  if (!isText.value) return;
-  if (!userInput.value.trim()) return;
+  if (!streaming.value) {
+    if (!isText.value) return;
+    if (!userInput.value.trim()) return;
 
-  const userMessage = userInput.value;
-  userInput.value = "";
+    const userMessage = userInput.value;
+    userInput.value = "";
 
-  await sendMessageToServer(userMessage, false);
+    await sendMessageToServerStream(userMessage, false);
+  } else {
+    interrupted.value = true;
+  }
 };
 
 const sendInitialMessage = async () => {
@@ -382,11 +401,71 @@ const sendMessageToServer = async (message, isInitial) => {
 
     botMessages.forEach((msg) => {
       addMessage("bot", msg.text);
+      scrollToBottom();
     });
   } catch (error) {
     console.error("Error sending message:", error);
   } finally {
     isTyping.value = false;
+  }
+};
+
+const sendMessageToServerStream = async (message, isInitial) => {
+  isTyping.value = true;
+  streaming.value = true;
+
+  if (!isInitial) {
+    addMessage("user", message);
+  }
+
+  scrollToBottom();
+
+  try {
+    const response = await fetch(props.webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: message,
+        sender: userSessionId.value,
+        stream: true,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let actual_done = false;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      actual_done = done;
+      if (done) break;
+      if (interrupted.value) break;
+      if (firsttime_bot.value) {
+        addMessage("bot", "");
+        bot_ref.value = messages.value[messages.value.length - 1];
+        isTyping.value = false;
+        firsttime_bot.value = !firsttime_bot.value;
+      }
+
+      const chunk = decoder.decode(value, { stream: true });
+      const chunk_split = chunk.split("data: ");
+      const data = JSON.parse(chunk_split[1]);
+      bot_ref.value.text += data["choices"][0]["delta"]["content"];
+      scrollToBottom();
+    }
+  } catch (error) {
+    console.error("Error sending message:", error);
+  } finally {
+    localStorage.setItem(chatHistorySessionId.value, JSON.stringify(messages.value));
+    streaming.value = false;
+    interrupted.value = false;
+    firsttime_bot.value = true;
   }
 };
 
@@ -396,10 +475,7 @@ const addMessage = (type, text, timestamp) => {
   }
   messages.value.push({ type, text, timestamp });
 
-  localStorage.setItem(
-    chatHistorySessionId.value,
-    JSON.stringify(messages.value)
-  );
+  localStorage.setItem(chatHistorySessionId.value, JSON.stringify(messages.value));
   scrollToBottom();
 };
 
@@ -417,39 +493,40 @@ const destroyWebSocket = () => {
 };
 
 const createWebSocket = () => {
-  const uri = props.webhookUrl
-    .replace("http://", "ws://")
-    .replace("https://", "wss://");
+  const uri = props.webhookUrl.replace("http://", "ws://").replace("https://", "wss://");
   ws.value = new WebSocket(
-    `${uri}/ws/${userSessionId.value}?language=${props.asrLanguage}`
+    `${uri}/ws/${userSessionId.value}?language=${props.asrLanguage}&minimum_trigger_vad_ms=${props.asrChunk}`
   );
   ws.value.onmessage = async function (event) {
     if (event.data == "<|silent|>") {
       silentcount.value += 1;
     } else {
-      if (firsttime.value) {
+      if (firsttime_user.value) {
         addMessage("user", "");
-        firsttime.value = !firsttime.value;
+        user_ref.value = messages.value[messages.value.length - 1];
+        firsttime_user.value = !firsttime_user.value;
       }
-      messages.value[messages.value.length - 1].text += event.data;
+      interrupted.value = true;
+      user_ref.value.text += event.data;
       scrollToBottom();
       silentcount.value = 0;
     }
 
-    if (silentcount.value >= props.minimumSilentSecond && !firsttime.value) {
-      recordAudio.value.pauseRecording();
-      localStorage.setItem(
-        chatHistorySessionId.value,
-        JSON.stringify(messages.value)
-      );
-      await sendMessageToServer(
+    if (
+      (props.asrChunk / 1000) * silentcount.value >= props.minimumSilentSecond &&
+      !firsttime_user.value
+    ) {
+      interrupted.value = false;
+      firsttime_user.value = !firsttime_user.value;
+      silentcount.value = 0;
+      //recordAudio.value.pauseRecording();
+      localStorage.setItem(chatHistorySessionId.value, JSON.stringify(messages.value));
+      await sendMessageToServerStream(
         messages.value[messages.value.length - 1].text,
         true
       );
 
-      firsttime.value = !firsttime.value;
-      silentcount.value = 0;
-      recordAudio.value.resumeRecording();
+      //recordAudio.value.resumeRecording();
     }
   };
 };
@@ -462,9 +539,7 @@ const destroyWaveSurfer = () => {
 
 async function asyncSend(blob) {
   const arr = await blob.arrayBuffer();
-  const base64String = btoa(
-    String.fromCharCode.apply(null, new Uint8Array(arr))
-  );
+  const base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(arr)));
   ws.value.send(base64String);
 }
 
@@ -554,12 +629,7 @@ const stream = async () => {
     const deviceId = micSelect.value;
     record.value.startRecording({ deviceId }).then(() => {});
   } else {
-    isText.value = true;
-
-    await nextTick();
-    destroyWaveSurfer();
-    destroyRecordRTC();
-    destroyWebSocket();
+    resetState();
   }
 };
 </script>

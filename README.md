@@ -7,11 +7,12 @@ Customizable Web Chat Widget 💬
 - Collapse and expand animation.
 - Waiting chat respond animation.
 - Customize color, title, font family and first message.
-- Custom POST request.
+- Support SSE Streaming, OpenAI compatibility.
+- Audio streaming using RecordRTC.
+- Interrupt button to stop streaming for text input.
+- Interrupt voice to stop streaming for audio input.
 - Auto generate user UUID and store the historical chats in UserSession.
 - Error message on exception.
-- Audio streaming using RecordRTC.
-- Support SSE Streaming (we will make OpenAI compatible).
 
 <img src="img/hi-there.png" width="50%">
 

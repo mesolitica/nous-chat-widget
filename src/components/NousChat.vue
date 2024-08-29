@@ -109,13 +109,17 @@ const props = defineProps({
     type: String,
     default: "1000",
   },
+  asrChunk: {
+    type: Number,
+    default: 800,
+  },
   asrLanguage: {
     type: String,
     default: "en",
   },
   minimumSilentSecond: {
-    type: BigInt,
-    default: 2,
+    type: Number,
+    default: 1.5,
   },
 });
 
