@@ -2,6 +2,8 @@
 
 Customizable Web Chat Widget 💬
 
+Currently this chat widget optimized for https://nous.my, but to change to use your own should be super easy to do it.
+
 ## Features 🔥
 
 - Collapse and expand animation.
@@ -16,7 +18,9 @@ Customizable Web Chat Widget 💬
 
 <img src="img/hi-there.png" width="50%">
 
-## how to dev
+## how to
+
+### development
 
 1. Use Yarn,
 
@@ -26,3 +30,78 @@ yarn run dev
 ```
 
 2. Access http://localhost:5173
+
+### build
+
+1. Use Yarn,
+
+```bash
+yarn build
+```
+
+2. Run [build.html](build.html).
+
+## Parameters
+
+```js
+const props = defineProps({
+  webhookUrl: {
+    type: String,
+    required: true,
+  },
+  color: {
+    type: String,
+    default: "#ff2627",
+  },
+  title: {
+    type: String,
+    default: "Padi Bot",
+  },
+  firstMessage: {
+    type: String,
+    default: "Chat with us",
+  },
+  secondMessage: {
+    type: String,
+    default: "How can we help you today?",
+  },
+  initPayload: {
+    type: String,
+    default: "SpecialInitPayLoadDoNotTouch",
+  },
+  zIndex: {
+    type: String,
+    default: "1000",
+  },
+  asrChunk: {
+    type: Number,
+    default: 800,
+  },
+  asrLanguage: {
+    type: String,
+    default: "en",
+  },
+  minimumSilentSecond: {
+    type: Number,
+    default: 1.5,
+  },
+});
+```
+
+To initialize,
+
+```html
+<script src="./dist/nous-chat.js"></script>
+<script>
+  Nous.init({
+    color: "#1076EE",
+    zIndex: "1000",
+    webhookUrl:
+      "https://search-api-v2.nous.mesolitica.com/chat/happytohelp@mesolitica.com/2968",
+    title: "Bot",
+    firstMessage: "Hi there!",
+    secondMessage: "How can I help you today?",
+    initPayload: "SpecialInitPayLoadDoNotTouch",
+  });
+</script>
+```
