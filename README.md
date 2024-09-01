@@ -20,7 +20,7 @@ Currently this chat widget optimized for https://nous.my, but to change to use y
 
 ### Voice interrupt example
 
-https://github.com/user-attachments/assets/e3f1ca3d-3737-4dee-8398-07c8046602b6
+https://github.com/user-attachments/assets/10f876c2-aa1d-400c-9796-102948083efa
 
 ## how to
 
