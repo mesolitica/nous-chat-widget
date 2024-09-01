@@ -18,7 +18,7 @@ Currently this chat widget optimized for https://nous.my, but to change to use y
 
 <img src="img/hi-there.png" width="50%">
 
-Video example using voice and interrupt,
+### Voice interrupt example
 
 https://github.com/user-attachments/assets/e3f1ca3d-3737-4dee-8398-07c8046602b6
 
