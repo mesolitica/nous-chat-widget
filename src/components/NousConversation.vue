@@ -539,7 +539,9 @@ const destroyWaveSurfer = () => {
 
 async function asyncSend(blob) {
   const arr = await blob.arrayBuffer();
-  const base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(arr)));
+  const base64String = btoa(
+    String.fromCharCode.apply(null, new Uint8Array(arr).slice(300))
+  );
   ws.value.send(base64String);
 }
 
@@ -564,6 +566,7 @@ const createRecordRTC = () => {
         recorderType: StereoAudioRecorder,
         numberOfAudioChannels: 1,
         timeSlice: 100,
+        bufferSize: 16384,
         ondataavailable: function (blob) {
           asyncSend(blob);
         },
