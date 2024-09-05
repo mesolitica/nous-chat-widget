@@ -127,6 +127,20 @@
           </div>
         </div>
 
+        <div v-else-if="message.type === 'error'" class="ns-flex ns-items-end ns-mb-4">
+          <!-- avatar -->
+          <!-- message content -->
+          <div class="ns-flex ns-flex-col">
+            <div class="ns-bg-red-600 ns-rounded-xl ns-p-3 ns-max-w-[100%]">
+              <p class="ns-text-sm ns-text-white">{{ message.text }}</p>
+            </div>
+            <!-- timestamp -->
+            <span class="ns-text-xs ns-text-gray-500 ns-mt-1">{{
+              formatTimestamp(message.timestamp)
+            }}</span>
+          </div>
+        </div>
+
         <!-- User chat bubble -->
         <div v-else class="ns-flex ns-justify-end ns-mb-4">
           <!-- message content -->
@@ -404,7 +418,7 @@ const sendMessageToServer = async (message, isInitial) => {
       scrollToBottom();
     });
   } catch (error) {
-    console.error("Error sending message:", error);
+    addMessage("error", `Error sending message: ${error}`);
   } finally {
     isTyping.value = false;
   }
@@ -453,19 +467,23 @@ const sendMessageToServerStream = async (message, isInitial) => {
         firsttime_bot.value = !firsttime_bot.value;
       }
 
-      const chunk = decoder.decode(value, { stream: true });
-      const chunk_split = chunk.split("data: ");
-      const data = JSON.parse(chunk_split[1]);
-      bot_ref.value.text += data["choices"][0]["delta"]["content"];
-      scrollToBottom();
+      const chunks = decoder.decode(value).split("\n");
+      for (var i = 0; i < chunks.length; i++) {
+        if (!chunks[i].startsWith("data:")) continue;
+        const chunk_split = chunks[i].split("data: ");
+        const data = JSON.parse(chunk_split[1]);
+        bot_ref.value.text += data["choices"][0]["delta"]["content"];
+        scrollToBottom();
+      }
     }
   } catch (error) {
-    console.error("Error sending message:", error);
+    addMessage("error", `Error sending message: ${error}`);
   } finally {
     localStorage.setItem(chatHistorySessionId.value, JSON.stringify(messages.value));
     streaming.value = false;
     interrupted.value = false;
     firsttime_bot.value = true;
+    isTyping.value = false;
   }
 };
 
@@ -574,7 +592,7 @@ const createRecordRTC = () => {
       recordAudio.value.startRecording();
     },
     function (error) {
-      console.error(JSON.stringify(error));
+      addMessage("error", `Failed to initiate audio streaming: ${error}`);
     }
   );
 };
