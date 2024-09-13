@@ -67,7 +67,9 @@
         {{ props.title }}
       </h1>
 
-      <DropdownMoreAction @start-new-session="handleStartNewSession"></DropdownMoreAction>
+      <DropdownMoreAction
+        @start-new-session="handleStartNewSession"
+      ></DropdownMoreAction>
     </div>
 
     <!-- body -->
@@ -90,7 +92,10 @@
               fill="none"
               viewBox="0 0 24 24"
             >
-              <g id="logo-86__logo-86" clip-path="url(#logo-86__clip0_1212_3644)">
+              <g
+                id="logo-86__logo-86"
+                clip-path="url(#logo-86__clip0_1212_3644)"
+              >
                 <path
                   id="logo-86__Vector"
                   fill="#007DFC"
@@ -118,7 +123,9 @@
             <div
               class="ns-bg-gray-100 ns-rounded-xl ns-rounded-bl-sm ns-p-3 ns-max-w-[100%]"
             >
-              <p class="ns-text-sm">{{ message.text }}</p>
+              <div class="ns-text-sm">
+                <CodeBlock :content="message.text" />
+              </div>
             </div>
             <!-- timestamp -->
             <span class="ns-text-xs ns-text-gray-500 ns-mt-1">{{
@@ -127,7 +134,10 @@
           </div>
         </div>
 
-        <div v-else-if="message.type === 'error'" class="ns-flex ns-items-end ns-mb-4">
+        <div
+          v-else-if="message.type === 'error'"
+          class="ns-flex ns-items-end ns-mb-4"
+        >
           <!-- avatar -->
           <!-- message content -->
           <div class="ns-flex ns-flex-col">
@@ -149,7 +159,9 @@
               class="ns-rounded-xl ns-rounded-br-sm ns-p-3 ns-max-w-[100%]"
               :style="{ backgroundColor: 'var(--nous-chat-color)' }"
             >
-              <p class="ns-text-sm ns-text-white">{{ message.text }}</p>
+              <div class="ns-text-sm ns-text-white">
+                {{ message.text }}
+              </div>
             </div>
 
             <!-- timestamp -->
@@ -225,7 +237,11 @@
           </div>
         </div>
         <div v-else key="audio" class="ns-pl-4">
-          <div id="waveform" ref="waveformContainer" class="ns-w-full ns-h-[32px]"></div>
+          <div
+            id="waveform"
+            ref="waveformContainer"
+            class="ns-w-full ns-h-[32px]"
+          ></div>
           <select class="ns-invisible" id="mic-select">
             <option value="" hidden>Select mic</option>
           </select>
@@ -266,6 +282,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch, inject, nextTick } from "vue";
+import CodeBlock from "./CodeBlock.vue";
 import TypingIndicator from "./TypingIndicator.vue";
 import DropdownMoreAction from "./DropdownMoreAction.vue";
 import { useFormatTimestamp } from "../composables/useFormatTimestamp";
@@ -479,7 +496,10 @@ const sendMessageToServerStream = async (message, isInitial) => {
   } catch (error) {
     addMessage("error", `Error sending message: ${error}`);
   } finally {
-    localStorage.setItem(chatHistorySessionId.value, JSON.stringify(messages.value));
+    localStorage.setItem(
+      chatHistorySessionId.value,
+      JSON.stringify(messages.value)
+    );
     streaming.value = false;
     interrupted.value = false;
     firsttime_bot.value = true;
@@ -493,7 +513,10 @@ const addMessage = (type, text, timestamp) => {
   }
   messages.value.push({ type, text, timestamp });
 
-  localStorage.setItem(chatHistorySessionId.value, JSON.stringify(messages.value));
+  localStorage.setItem(
+    chatHistorySessionId.value,
+    JSON.stringify(messages.value)
+  );
   scrollToBottom();
 };
 
@@ -511,7 +534,9 @@ const destroyWebSocket = () => {
 };
 
 const createWebSocket = () => {
-  const uri = props.webhookUrl.replace("http://", "ws://").replace("https://", "wss://");
+  const uri = props.webhookUrl
+    .replace("http://", "ws://")
+    .replace("https://", "wss://");
   ws.value = new WebSocket(
     `${uri}/ws/${userSessionId.value}?language=${props.asrLanguage}&minimum_trigger_vad_ms=${props.asrChunk}`
   );
@@ -531,14 +556,18 @@ const createWebSocket = () => {
     }
 
     if (
-      (props.asrChunk / 1000) * silentcount.value >= props.minimumSilentSecond &&
+      (props.asrChunk / 1000) * silentcount.value >=
+        props.minimumSilentSecond &&
       !firsttime_user.value
     ) {
       interrupted.value = false;
       firsttime_user.value = !firsttime_user.value;
       silentcount.value = 0;
       //recordAudio.value.pauseRecording();
-      localStorage.setItem(chatHistorySessionId.value, JSON.stringify(messages.value));
+      localStorage.setItem(
+        chatHistorySessionId.value,
+        JSON.stringify(messages.value)
+      );
       await sendMessageToServerStream(
         messages.value[messages.value.length - 1].text,
         true
