@@ -15,13 +15,17 @@ Currently this chat widget optimized for https://nous.my, but to change to use y
 - Interrupt voice to stop streaming for audio input.
 - Auto generate user UUID and store the historical chats in UserSession.
 - Error message on exception.
-- Support Markdown.
+- Support Markdown and code blocks real-time rendering.
 
 <img src="img/hi-there.png" width="50%">
 
 ### Voice interrupt example
 
 https://github.com/user-attachments/assets/10f876c2-aa1d-400c-9796-102948083efa
+
+### Voice code block real-time rendering example
+
+https://github.com/user-attachments/assets/2fda84d0-243c-4e58-acfb-889518e9d9e8
 
 ## how to
 
