@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@unovis/ts": "^1.4.3-beta.0",
+    "@unovis/vue": "^1.4.3-beta.0",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.4",
     "highlight.js": "^11.10.0",

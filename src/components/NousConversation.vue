@@ -493,6 +493,8 @@ const sendMessageToServerStream = async (message, isInitial) => {
         scrollToBottom();
       }
     }
+
+    bot_ref.value.text += "\n```graph\n\na\n```";
   } catch (error) {
     addMessage("error", `Error sending message: ${error}`);
   } finally {

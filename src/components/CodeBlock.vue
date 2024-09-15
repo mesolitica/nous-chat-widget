@@ -1,7 +1,29 @@
 <template>
   <div v-for="(token, index) in tokens" :key="index">
     <div v-if="token.type == 'code'" class="ns-pt-4 ns-pb-4">
-      <div class="ns-bg-gray-800 ns-rounded-lg ns-overflow-hidden">
+      <div v-if="token.lang == 'graph'" class="ns-pt-4 ns-pb-4">
+        <VisXYContainer
+          :duration="0"
+          :height="300"
+          :width="250"
+          :xDomain="[1961, 2022]"
+          :yDomain="[0, 650]"
+        >
+          <VisLine :data="data" :x="x" :y="y" :fallbackValue="fallbackValue" />
+          <VisXYLabels
+            :style="{ backgroundColor: 'none' }"
+            v-bind="labelConfig"
+          />
+          <VisAxis type="x" :numTicks="10" />
+          <VisAxis
+            type="y"
+            label="National Cereal Production, tons"
+            :tickFormat="(d) => `${d}${d ? 'M' : ''}`"
+            :tickValues="[0, 200, 400, fallbackValue, 600]"
+          />
+        </VisXYContainer>
+      </div>
+      <div v-else class="ns-bg-gray-800 ns-rounded-lg ns-overflow-hidden">
         <div
           class="ns-flex ns-justify-between ns-items-center ns-p-2 ns-bg-gray-700"
         >
@@ -62,12 +84,22 @@
         ></pre>
       </div>
     </div>
+
     <div v-else v-html="marked.parse(token.raw)"></div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import {
+  VisXYContainer,
+  VisLine,
+  VisBulletLegend,
+  VisAxis,
+  VisXYLabels,
+} from "@unovis/vue";
+import { countries, data, legendItems } from "./data.ts";
+
+import { ref, watch, computed } from "vue";
 import { marked } from "marked";
 import hljs from "highlight.js";
 import "highlight.js/styles/github-dark.css";
@@ -112,4 +144,31 @@ const copyCode = (index) => {
     }, 1000);
   });
 };
+
+function getY(c) {
+  return (d) => d[c.id];
+}
+
+const x = (d) => d.year;
+const y = countries.map(getY);
+const labelConfig = {
+  data: countries,
+  x: 2019.5,
+  y: (c) => getY(c)(data[data.length - 1]),
+  label: (c) => c.label,
+};
+
+const curr = ref(0);
+const fallbackValue = computed(() => legendItems[curr.value].value);
+const items = computed(() =>
+  legendItems.map((o, i) => ({
+    name: o.name,
+    inactive: curr.value !== i,
+    color: countries[0].color,
+  }))
+);
+
+function onLegendItemClick(_, i) {
+  curr.value = i;
+}
 </script>
