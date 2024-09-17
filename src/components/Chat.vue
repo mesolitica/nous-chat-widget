@@ -62,7 +62,7 @@
         ></pre>
       </div>
     </div>
-    <div v-else v-html="marked.parse(token.raw)"></div>
+    <div v-else v-html="marked.parse(token.raw, options)"></div>
   </div>
 </template>
 
@@ -76,16 +76,20 @@ import DOMPurify from "isomorphic-dompurify";
 const renderer = new marked.Renderer();
 const tokens = ref([]);
 
-renderer.codespan = (code) => {
-  return `<code>${code.replaceAll("&amp;", "&")}</code>`;
+renderer.link = (href, title, text) => {
+  const t = `<sup><a href="${href}" class="ns-text-primary-500">[${text}]</a></sup>`;
+  return t;
 };
 
-renderer.link = (href, title, text) => {
-  return `<a href="${href?.replace(
-    />$/,
-    ""
-  )}" target="_blank" rel="noreferrer">${text}</a>`;
+renderer.heading = (text, level, raw) => {
+  return `<h${level} class="ns-pt-2 ns-pb-2 ns-text-white">${text}</h${level}>\n`;
 };
+
+const options = ref({
+  gfm: true,
+  breaks: true,
+  renderer: renderer,
+});
 
 const props = defineProps({
   content: {

@@ -1,48 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chat Widget Test</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
 
-        h1 {
-            color: #333;
-        }
-
-        .content {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+      .content {
+        max-width: 800px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
     </style>
-</head>
+  </head>
 
-<body>
-
+  <body>
+    <link rel="stylesheet" href="./dist/style.css" />
     <script src="./dist/nous-chat.js"></script>
     <script>
-        Nous.init({
-            color: '#1076EE',
-            zIndex: '1000',
-            webhookUrl: 'https://search-api-v2.nous.mesolitica.com/chat/happytohelp@mesolitica.com/2968',
-            title: 'Microlink Bot',
-            firstMessage: "Hi there!",
-            secondMessage: "How can I help you today?",
-            initPayload: 'SpecialInitPayLoadDoNotTouch'
-        });
+      Nous.init({
+        color: "#1076EE",
+        zIndex: "1000",
+        webhookUrl:
+          "https://search-api-v2.nous.mesolitica.com/chat/happytohelp@mesolitica.com/2993",
+        title: "Microlink Bot",
+        firstMessage: "Hi there!",
+        secondMessage: "How can I help you today?",
+        initPayload: "SpecialInitPayLoadDoNotTouch",
+      });
     </script>
-</body>
-
+  </body>
 </html>

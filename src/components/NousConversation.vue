@@ -124,7 +124,7 @@
               class="ns-bg-gray-100 ns-rounded-xl ns-rounded-bl-sm ns-p-3 ns-max-w-[100%]"
             >
               <div class="ns-text-sm">
-                <CodeBlock :content="message.text" />
+                <Chat :content="message.text" />
               </div>
             </div>
             <!-- timestamp -->
@@ -160,7 +160,7 @@
               :style="{ backgroundColor: 'var(--nous-chat-color)' }"
             >
               <div class="ns-text-sm ns-text-white">
-                {{ message.text }}
+                <Chat :content="message.text" />
               </div>
             </div>
 
@@ -282,7 +282,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch, inject, nextTick } from "vue";
-import CodeBlock from "./CodeBlock.vue";
+import Chat from "./Chat.vue";
 import TypingIndicator from "./TypingIndicator.vue";
 import DropdownMoreAction from "./DropdownMoreAction.vue";
 import { useFormatTimestamp } from "../composables/useFormatTimestamp";
