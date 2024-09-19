@@ -85,6 +85,29 @@ renderer.heading = (text, level, raw) => {
   return `<h${level} class="ns-pt-2 ns-pb-2 ns-text-white">${text}</h${level}>\n`;
 };
 
+renderer.list = (body, ordered, start) => {
+  const type = ordered ? "ol" : "ul";
+  const startatt = ordered && start !== 1 ? ' start="' + start + '"' : "";
+  const listClass = ordered ? "ns-list-decimal" : "ns-list-disc";
+  return (
+    "<" +
+    type +
+    startatt +
+    " class='ns-gap-2 ns-grid ns-pt-2 ns-pl-4 " +
+    listClass +
+    "'>\n" +
+    body +
+    "</" +
+    type +
+    ">\n"
+  );
+};
+
+renderer.listitem = (text, task, checked) => {
+  const s = `<li>${text.trim()}</li>\n`;
+  return s;
+};
+
 const options = ref({
   gfm: true,
   breaks: true,

@@ -106,8 +106,16 @@ const props = defineProps({
     default: "SpecialInitPayLoadDoNotTouch",
   },
   zIndex: {
+    type: Number,
+    default: 1000,
+  },
+  width: {
     type: String,
-    default: "1000",
+    default: "364px",
+  },
+  height: {
+    type: String,
+    default: "620px",
   },
   asrChunk: {
     type: Number,
@@ -143,8 +151,8 @@ onMounted(() => {
 const widgetStyle = computed(() => ({
   "--nous-chat-color": props.color,
   "--nous-chat-z-index": props.zIndex,
-  "--nous-chat-width": "364px",
-  "--nous-chat-height": "620px",
+  "--nous-chat-width": props.width,
+  "--nous-chat-height": props.height,
 }));
 
 // Functions
