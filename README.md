@@ -23,6 +23,10 @@ Currently this chat widget optimized for https://nous.my, but to change to use y
 
 https://github.com/user-attachments/assets/10f876c2-aa1d-400c-9796-102948083efa
 
+### Real-time graph visualization
+
+https://github.com/user-attachments/assets/50a49ed0-c79d-40c0-aa47-a076c880bba9
+
 ## how to
 
 ### development
