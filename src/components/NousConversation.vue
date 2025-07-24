@@ -181,8 +181,8 @@
 
     <!-- input area -->
     <div class="ns-relative ns-grid ns-grid-cols-10">
-      <div class="ns-col-span-8 ns-h-[48px]">
-        <div v-if="isText" key="textbox" class="ns-pl-4">
+      <div :class="['ns-h-[48px]', props.enableMicrophone ? 'ns-col-span-8' : 'ns-col-span-10']">
+        <div v-if="isText" key="textbox" :class="['ns-pl-4', !props.enableMicrophone && 'ns-pr-4']">
           <div
             class="ns-flex ns-items-center ns-border ns-border-gray-200 ns-bg-gray-50 ns-rounded-full ns-px-4 ns-h-12"
           >
@@ -235,7 +235,7 @@
           </select>
         </div>
       </div>
-      <div class="ns-flex">
+      <div class="ns-flex" v-if="props.enableMicrophone">
         <button class="ns-pl-2" @click="stream">
           <svg
             xmlns="http://www.w3.org/2000/svg"

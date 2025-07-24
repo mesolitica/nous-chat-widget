@@ -79,8 +79,16 @@ const props = defineProps({
     default: "SpecialInitPayLoadDoNotTouch",
   },
   zIndex: {
+    type: Number,
+    default: 1000,
+  },
+  width: {
     type: String,
-    default: "1000",
+    default: "364px",
+  },
+  height: {
+    type: String,
+    default: "620px",
   },
   asrChunk: {
     type: Number,
@@ -88,11 +96,19 @@ const props = defineProps({
   },
   asrLanguage: {
     type: String,
-    default: "en",
+    default: "none",
   },
   minimumSilentSecond: {
     type: Number,
     default: 1.5,
+  },
+  branding: {
+    type: String,
+    default: "Powered by Nous",
+  },
+  enableMicrophone: {
+    type: Boolean,
+    default: true,
   },
 });
 ```

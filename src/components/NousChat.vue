@@ -133,6 +133,10 @@ const props = defineProps({
     type: String,
     default: "Powered by Nous",
   },
+  enableMicrophone: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 // Provide all props to child components
